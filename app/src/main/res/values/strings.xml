@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">GoToPaste</string>
+    <string name="app_name">gotoPaste</string>
+    <string name="query">查询</string>
+    <string name="new_shared_info">创建新的共享信息</string>
+    <string name="new_shared_file">创建新的共享文件</string>
+    <string name="help">查看gotoPaste使用指南</string>
 </resources>
