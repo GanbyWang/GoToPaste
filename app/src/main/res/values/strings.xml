@@ -5,4 +5,8 @@
     <string name="new_shared_file">创建新的共享文件</string>
     <string name="help">查看gotoPaste使用指南</string>
     <string name="log_in_logo">登录</string>
+    <string name="title_activity_user">UserActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
