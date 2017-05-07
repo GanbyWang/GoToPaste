@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This file is used for the toolbar menu of the MainActivity -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/log_in"
-        android:icon="@drawable/log_in"
-        android:title="@string/log_in_logo"
+        android:icon="@drawable/post_40"
+        android:title="@string/post_logo"
         app:showAsAction="always" />
 
 </menu>
