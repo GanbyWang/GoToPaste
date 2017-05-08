@@ -38,7 +38,7 @@
             android:textColor="@android:color/black" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/new_pwd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/more_40" />
