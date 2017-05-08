@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file is used for the toolbar menu of the MainActivity -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/post"
+        android:icon="@drawable/post"
+        android:title="@string/post_file"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -11,14 +11,18 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
         <activity android:name=".UserActivity">
+
+        </activity>
+        <activity android:name=".PostFileActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PostFileActivity" />
-        <activity android:name=".PostMsgActivity" />
+        <activity android:name=".PostMsgActivity" >
+
+        </activity>
         <activity android:name=".ViewMsgActivity" />
         <activity android:name=".ViewFileActivity"></activity>
     </application>
