@@ -16,30 +16,63 @@
         app:titleTextAppearance="@style/ToolbarTitle"
         app:subtitleTextAppearance="@style/ToolbarSubtitle">
 
-        <TextView
-            android:layout_width="wrap_content"
+
+        <LinearLayout
             android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:layout_gravity="center"
-            android:id="@+id/toolbar_title"
-            android:textSize="18sp"
-            android:textColor="#000000"/>
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+        <EditText
+            android:id="@+id/shared_code"
+            android:layout_width="170dp"
+            android:layout_height="30dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:background="@drawable/bg_edittext_full"
+            android:ems="14"
+            android:inputType="number" />
+
+            <ImageButton
+                android:id="@+id/seek_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_right_green"
+                app:srcCompat="@drawable/seek_white_30" />
+
+        </LinearLayout>
 
     </android.support.v7.widget.Toolbar>
 
-    <RelativeLayout
-        android:id="@+id/fragment_root"
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_navigation_bar"
-        android:layout_alignParentStart="true"
+        android:id="@+id/swipe_msg_list"
         android:layout_below="@+id/toolbar">
 
-    </RelativeLayout>
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/msg_list" />
 
-    <com.ashokvarma.bottomnavigation.BottomNavigationBar
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/post_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_80"
         android:layout_alignParentBottom="true"
-        android:id="@+id/bottom_navigation_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        app:backgroundTint="@color/my_green"
+        app:borderWidth="0dp"
+        app:fabSize="normal"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        app:rippleColor="@color/my_gray" />
 
 </RelativeLayout>
