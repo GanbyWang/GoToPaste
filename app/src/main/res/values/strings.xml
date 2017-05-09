@@ -15,6 +15,10 @@
     <string name="default_post_msg">你需要发布...</string>
     <string name="set_private">设为私有</string>
     <string name="post_file">发布文件</string>
+    <string name="add_ten_minutes">+10分钟</string>
+    <string name="add_sixty_minutes">+60分钟</string>
+    <string name="save">保存</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

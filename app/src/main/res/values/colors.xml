@@ -7,4 +7,10 @@
     <color name="my_gray">#f3f4f6</color>
     <color name="my_indigo">#b9e3d9</color>
     <color name="my_green">#036564</color>
+
+    <color name="save_button">#00b5ad</color>
+    <color name="add_time_button">#e0e1e2</color>
+    <color name="add_time_letter">#5a5a5a</color>
+    <color name="rest_time">#636364</color>
+
 </resources>
