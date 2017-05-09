@@ -35,10 +35,11 @@ public class PostActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
+        // set the
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Log.i("navigation","clicked");
+                public void onClick(View v) {
+                finish();
             }
         });
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

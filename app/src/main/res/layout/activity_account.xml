@@ -1,21 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.wangyicheng.gotopaste.AccountFragment"
-    android:background="@color/my_gray">
+    android:background="@color/my_gray"
+    tools:context="com.example.wangyicheng.gotopaste.AccountActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:subtitleTextAppearance="@style/ToolbarSubtitle">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/account_center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+    </android.support.v7.widget.Toolbar>
 
     <Button
-        android:id="@+id/logout"
+        android:id="@+id/logout_button"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
         android:background="@drawable/bg_button"
         android:text="@string/logout"
-        android:textColor="#ffffff"
-        android:layout_marginBottom="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:textColor="#ffffff" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,5 +71,7 @@
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/default_profile_80"
         android:layout_marginTop="30dp"
+        android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
