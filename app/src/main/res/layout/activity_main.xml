@@ -21,7 +21,7 @@
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
         android:layout_marginStart="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/new_shared_info"
+        app:layout_constraintBottom_toBottomOf="@+id/add_file"
         android:layout_marginEnd="30dp"
         android:layout_marginTop="85dp"
         tools:layout_constraintLeft_creator="1"
@@ -29,7 +29,7 @@
         app:layout_constraintTop_toTopOf="@+id/linearLayout" />
 
     <LinearLayout
-        android:id="@+id/new_shared_info"
+        android:id="@+id/add_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_button"
@@ -75,8 +75,8 @@
         android:text="@string/help"
         android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@+id/new_shared_info"
-        app:layout_constraintRight_toRightOf="@+id/new_shared_info"
+        app:layout_constraintLeft_toLeftOf="@+id/add_file"
+        app:layout_constraintRight_toRightOf="@+id/add_file"
         tools:layout_constraintBottom_creator="1"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
