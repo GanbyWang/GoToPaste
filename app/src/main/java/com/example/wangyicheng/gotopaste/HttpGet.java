@@ -14,7 +14,7 @@ import java.net.URL;
  * Created by wangyicheng on 2017/5/10.
  */
 
-class HttpGet {
+public class HttpGet {
     // Set result
     public static final int GET_SUCC = 0;
     public static final int GET_FAIL = 1;

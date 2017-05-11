@@ -21,7 +21,7 @@ import okhttp3.Response;
  * Created by wangyicheng on 2017/5/10.
  */
 
-class HttpPost {
+public class HttpPost {
     // Set result
     static final int POST_SUCC = 2;
     static final int POST_FAIL = 3;

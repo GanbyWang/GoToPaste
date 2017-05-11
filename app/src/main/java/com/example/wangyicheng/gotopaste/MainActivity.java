@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout postNew;
     private String sharingCode;
     private Button queryButton;
+
+    private MsgInfo msgInfo;
 
     Handler handler = new Handler() {
         @Override
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         // as the user might come back from posting
                         // here we don't finish the activity
+
                     } catch(JSONException e) {
                         e.printStackTrace();
                     }
@@ -60,6 +64,24 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         // get the jason object
                         JSONObject jsonObject = new JSONObject(msg.obj.toString());
+
+                        // if the sharing code is illegal or empty
+                        // TODO: have to deal with how to differ a file is empty
+                        if(jsonObject.getString("result").equals("200") == false) {
+                            Toast.makeText(getApplicationContext(), "该共享码不存在", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        // jump to display activity
+                        // leave the resolution to the next activity
+                        Bundle bundle = new Bundle();
+                        bundle.putString("msgInfo", msg.obj.toString());
+
+                        Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        // as the user might come back from posting
+                        // here we don't finish the activity
 
                     } catch(JSONException e) {
                         e.printStackTrace();

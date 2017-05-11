@@ -13,7 +13,7 @@ import java.net.URL;
  * Created by wangyicheng on 2017/5/10.
  */
 
-class HttpDelete {
+public class HttpDelete {
     // Set result
     static final int DELETE_SUCC = 6;
     static final int DELETE_FAIL = 7;

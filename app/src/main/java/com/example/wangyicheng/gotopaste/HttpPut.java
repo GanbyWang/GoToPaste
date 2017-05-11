@@ -14,7 +14,7 @@ import java.net.URL;
  * Created by wangyicheng on 2017/5/10.
  */
 
-class HttpPut {
+public class HttpPut {
     // Set result
     static final int PUT_SUCC = 4;
     static final int PUT_FAIL = 5;

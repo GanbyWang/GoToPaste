@@ -22,6 +22,7 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".PostActivity" />
+        <activity android:name=".DisplayActivity" />
         <activity android:name=".AccountActivity"></activity>
     </application>
 
