@@ -6,7 +6,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,6 +54,7 @@ public class DisplayActivity extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(originalData);
 
             // set the msgInfo
+
             msgInfo.setTitle(jsonObject.getString("title"));
             msgInfo.setSharedMsg(jsonObject.getString("shared_msg"));
             msgInfo.setTime(Integer.valueOf(jsonObject.getString("time")));
