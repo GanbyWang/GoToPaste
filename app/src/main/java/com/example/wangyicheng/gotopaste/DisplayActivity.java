@@ -17,6 +17,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 public class DisplayActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -25,37 +26,41 @@ public class DisplayActivity extends AppCompatActivity {
     private TextView shareCode;
     private TextView fileName;
     private LinearLayout saveLayout;
-    private LinearLayout addTimeLayout;
     private LinearLayout fileLayout;
     private TimeThread updateThread;
     private static final int msgKey1 = 1;
     private String result;
     private String fileURL;
 
-
+    private TextView addTenMin;
+    private TextView addOneHr;
+    private TextView deleteFile;
+    private TextView downloadFile;
 
     private int timeLeft;
     private TextView timeText;
     private String timeString;
-    Handler handler_ten_minutes = new Handler(){
+
+    // this handler is used to prolong 10 min
+    Handler handler_ten_minutes = new Handler() {
         @Override
-        public void handleMessage(Message msg){
-            switch(msg.what)
-            {
+        public void handleMessage(Message msg) {
+            switch(msg.what) {
                 case HttpPut.PUT_SUCC:
-                    try{
+                    try {
                         JSONObject jsonInfo = new JSONObject(msg.obj.toString());
                         result = jsonInfo.getString("result");
+
+                        // update the left time
                         timeLeft += 600;
                         msgInfo.setTime(timeLeft);
                         Toast.makeText(getApplicationContext(), "修改时间成功", Toast.LENGTH_LONG).show();
 
-                    }
-                    catch (JSONException e){
+                    } catch (JSONException e) {
                         e.printStackTrace();
-
-                }
+                    }
                     break;
+
                 case HttpPut.PUT_FAIL:
                     Toast.makeText(getApplicationContext(), "修改时间失败", Toast.LENGTH_LONG).show();
                     break;
@@ -63,31 +68,35 @@ public class DisplayActivity extends AppCompatActivity {
             }
         }
     };
-    Handler handler_sixty_minutes = new Handler(){
+
+    // this handler is used to prolong 1 hr
+    Handler handler_sixty_minutes = new Handler() {
         @Override
-        public void handleMessage(Message msg){
-            switch(msg.what)
-            {
+        public void handleMessage(Message msg) {
+            switch(msg.what) {
                 case HttpPut.PUT_SUCC:
-                    try{
+                    try {
                         JSONObject jsonInfo = new JSONObject(msg.obj.toString());
                         result = jsonInfo.getString("result");
+
+                        // update the left time
                         timeLeft += 3600;
                         msgInfo.setTime(timeLeft);
                         Toast.makeText(getApplicationContext(), "修改时间成功", Toast.LENGTH_LONG).show();
-                    }
-                    catch (JSONException e){
-                        e.printStackTrace();
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                     break;
+
                 case HttpPut.PUT_FAIL:
                     Toast.makeText(getApplicationContext(), "修改时间失败", Toast.LENGTH_LONG).show();
                     break;
-
             }
         }
     };
+
+    // this thread is used to update time
     public class TimeThread extends Thread {
         @Override
         public void run() {
@@ -96,6 +105,7 @@ public class DisplayActivity extends AppCompatActivity {
                     Thread.sleep(1000);
                     Message msg = new Message();
                     msg.what = msgKey1;
+                    mHandler.sendMessage(msg);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -104,6 +114,7 @@ public class DisplayActivity extends AppCompatActivity {
         }
     }
 
+    // used for TimeThread
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage (Message msg) {
@@ -111,20 +122,14 @@ public class DisplayActivity extends AppCompatActivity {
             switch (msg.what) {
                 case msgKey1:
                     timeLeft = timeLeft - 1;
-                    msgInfo.setTime(timeLeft);
-                    timeString = Integer.toString(timeLeft);
-                    timeText.setText("还有"+ timeString+"秒失效");
+                    timeText.setText("还有"+ timeLeft + "秒失效");
                     break;
 
                 default:
                     break;
             }
-
         }
     };
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,100 +145,90 @@ public class DisplayActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.back);
-        toolbar.inflateMenu(R.menu.post_toolbar_menu);
+
         //initialize text to be displayed
         msgDisplay = (EditText) findViewById(R.id.message);
         if(msgInfo.getResult() != null)
             msgDisplay.setText(msgInfo.getResult());
 
+        // display the sharing code
         shareCode = (TextView) findViewById(R.id.share_code);
-        shareCode.setText(msgInfo.getSharedMsg());
+        shareCode.setText("共享码：" + bundle.getString("sharingCode"));
 
+        // display the time
         timeLeft = msgInfo.getTime();
         timeText = (TextView) findViewById(R.id.timeLeftText);
-        timeString = Integer.toString(timeLeft);
-        timeText.setText(timeString);
+        timeText.setText("还有" + msgInfo.getTime() + "秒失效");
 
+        // display the file name
         fileName = (TextView) findViewById(R.id.file_name);
-        if(msgInfo.getFile() == null)
-        {
+        if(msgInfo.getFile() == null) {
             fileName.setText("没有附件文件");
             fileURL = null;
         }
-        else
-        {
+        else {
             fileName.setText(msgInfo.getFile()[0].getFileName());
+            // get the file url
             fileURL = msgInfo.getFile()[0].getUrl();
         }
 
-
-
-
-        //count down thread
-
+        // count down thread
         updateThread = new TimeThread();
         updateThread.start();
-
 
         //set listener on save
         saveLayout = (LinearLayout) findViewById(R.id.save_layout);
         saveLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                //to be continued;
+                // TODO: to be continued
             }
         });
 
-        // set listener on addtime
-        addTimeLayout = (LinearLayout) findViewById(R.id.addTimeLayout);
-        addTimeLayout.setOnClickListener(new View.OnClickListener(){
+        // set listener on add_ten_minutes and send request
+        addTenMin = (TextView) findViewById(R.id.add_ten_minutes);
+        addTenMin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                switch(v.getId())
-                {
-                    case R.id.add_ten_minutes:
-                        new HttpPut("\"scope\":600".getBytes(), "http://162.105.175.115:8004/message/" + shareCode+"/addtime", handler_ten_minutes, HttpPut.PUT_MODIFY);
-                        ;
-                        break;
-                    case R.id.add_sixty_minutes:
-                        new HttpPut("\"scope\":3600".getBytes(), "http://162.105.175.115:8004/message/" + shareCode+"/addtime", handler_sixty_minutes, HttpPut.PUT_MODIFY);
-                        break;
-                    default:
-                }
+            public void onClick(View v) {
+                new HttpPut("{\"scope\":600}".getBytes(),
+                        "http://162.105.175.115:8004/message/" + shareCode + "/addtime",
+                        handler_ten_minutes, HttpPut.PUT_MODIFY);
             }
         });
 
-        //set listener on files
-        fileLayout = (LinearLayout) findViewById(R.id.filelayout);
-        fileLayout.setOnClickListener(new View.OnClickListener(){
+        // set listener on add_sixty_minutes and send request
+        addOneHr = (TextView) findViewById(R.id.add_sixty_minutes);
+        addOneHr.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                switch(v.getId())
-                {
-                    case R.id.download_file:
-
-                        break;
-                    case R.id.delete_file:
-                        break;
-                    default:
-                }
+            public void onClick(View v) {
+                new HttpPut("{\"scope\":3600}".getBytes(),
+                        "http://162.105.175.115:8004/message/" + shareCode + "/addtime",
+                        handler_ten_minutes, HttpPut.PUT_MODIFY);
             }
         });
 
+        // set the listeners of the file opereations: delete and download
+        deleteFile = (TextView) findViewById(R.id.delete_file);
+        deleteFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: delete the file
+            }
+        });
 
+        downloadFile = (TextView) findViewById(R.id.download_file);
+        downloadFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: download the file
+            }
+        });
 
-
+        // set back icon listener
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("navigation","clicked");
-            }
-        });
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.i("menu","clicked");
-                return true;
+                finish();
             }
         });
     }
@@ -263,5 +258,13 @@ public class DisplayActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    // stop the time thread when this activity is to be destroyed
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        updateThread.interrupt();
     }
 }

@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout postNew;
     private String sharingCode;
     private Button queryButton;
+    private String querySharingCode;
 
     private MsgInfo msgInfo;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
                         // leave the resolution to the next activity
                         Bundle bundle = new Bundle();
                         bundle.putString("msgInfo", msg.obj.toString());
+                        bundle.putString("sharingCode", querySharingCode);
 
                         Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
                         intent.putExtras(bundle);
@@ -146,17 +148,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 TextView shareNumber = (TextView) findViewById(R.id.share_number);
-                String sharingNumber = shareNumber.getText().toString();
+                querySharingCode = shareNumber.getText().toString();
 
                 // the user haven't put in sharing code
-                if(sharingNumber.equals("")) {
+                if(querySharingCode.equals("")) {
                     Toast.makeText(getApplicationContext(), "请输入共享码", Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 // send a get request
                 // no token (send as empty) and set type as TYPE_GETMSG
-                new HttpPost("{}".getBytes(), "http://162.105.175.115:8004/message/" + sharingNumber, queryHandler, HttpGet.TYPE_GETMSG);
+                new HttpPost("{}".getBytes(), "http://162.105.175.115:8004/message/" + querySharingCode, queryHandler, HttpGet.TYPE_GETMSG);
             }
         });
     }
