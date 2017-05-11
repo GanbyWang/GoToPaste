@@ -28,39 +28,13 @@ public class MainActivity extends AppCompatActivity {
 
     private MsgInfo msgInfo;
 
-    Handler handler = new Handler() {
+    // this handler is used for query a sharing code
+    Handler queryHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 // if it's a POST request and it succeeded
                 case HttpPost.POST_SUCC:
-                    try {
-                        // get the jason object
-                        JSONObject jsonInfo = new JSONObject(msg.obj.toString());
-                        sharingCode = jsonInfo.getString("share_code");
-
-                        // transfer the sharing code as a parameter
-                        Bundle bundle = new Bundle();
-                        bundle.putString("sharingCode", sharingCode);
-
-                        Intent intent = new Intent(MainActivity.this, PostActivity.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                        // as the user might come back from posting
-                        // here we don't finish the activity
-
-                    } catch(JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-
-                // if the post request fails
-                case HttpPost.POST_FAIL:
-                    Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
-                    break;
-
-                // if it's a GET request and it succeeded
-                case HttpGet.GET_SUCC:
                     try {
                         // get the jason object
                         JSONObject jsonObject = new JSONObject(msg.obj.toString());
@@ -89,7 +63,42 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 // if the GET request fails
-                case HttpGet.GET_FAIL:
+                case HttpPost.POST_FAIL:
+                    Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
+    // this handler is used for creating a new shared message
+    Handler newHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                // if it's a POST request and it succeeded
+                case HttpPost.POST_SUCC:
+                    try {
+                        // get the jason object
+                        JSONObject jsonInfo = new JSONObject(msg.obj.toString());
+                        sharingCode = jsonInfo.getString("share_code");
+
+                        // transfer the sharing code as a parameter
+                        Bundle bundle = new Bundle();
+                        bundle.putString("sharingCode", sharingCode);
+
+                        Intent intent = new Intent(MainActivity.this, PostActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        // as the user might come back from posting
+                        // here we don't finish the activity
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                // if the post request fails
+                case HttpPost.POST_FAIL:
                     Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
                     break;
             }
@@ -127,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // send a post request
                 // no token (send as empty) and set type as TYPE_NEW
-                new HttpPost("".getBytes(), "http://162.105.175.115:8004/message/new", handler, HttpPost.TYPE_NEW);
+                new HttpPost("{}".getBytes(), "http://162.105.175.115:8004/message/new", newHandler, HttpPost.TYPE_NEW);
             }
         });
 
@@ -147,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // send a get request
                 // no token (send as empty) and set type as TYPE_GETMSG
-                new HttpGet("".getBytes(), "http://162.105.175.115:8004/message/" + sharingNumber, handler, HttpGet.TYPE_GETMSG);
+                new HttpPost("{}".getBytes(), "http://162.105.175.115:8004/message/" + sharingNumber, queryHandler, HttpGet.TYPE_GETMSG);
             }
         });
     }

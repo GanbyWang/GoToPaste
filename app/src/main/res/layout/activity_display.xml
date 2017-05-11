@@ -46,6 +46,7 @@
             android:gravity="top"
             android:inputType="textMultiLine"
             android:padding="10dp"
+            android:text="这个消息附加一个文件，你可以下载或者删除它"
             android:textSize="14sp" />
 
         <View

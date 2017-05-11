@@ -28,7 +28,7 @@ public class HttpGet {
 
     // As we may have to transfer token to the server
     // srcData is required to pass the token
-    public HttpGet(final byte[] srcData, final String urlString, final Handler handler, final int type) {
+    public HttpGet(final String urlString, final Handler handler, final int type) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -53,11 +53,11 @@ public class HttpGet {
                     connection.setRequestProperty("Content-Type", "application/json");
 
                     // Get OutputStream
-                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                    // DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
                     // Write to OutputStream
-                    outputStream.write(srcData);
-                    outputStream.flush();
-                    outputStream.close();
+                    // outputStream.write(srcData);
+                    // outputStream.flush();
+                    // outputStream.close();
 
                     // System.out.println(connection.getResponseCode());
                     // Http Success
