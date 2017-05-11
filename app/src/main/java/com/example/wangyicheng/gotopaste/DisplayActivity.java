@@ -20,26 +20,25 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 public class DisplayActivity extends AppCompatActivity {
+    // the following variables are the views in the xml file
     private Toolbar toolbar;
-    private MsgInfo msgInfo;
     private EditText msgDisplay;
     private TextView shareCode;
     private TextView fileName;
-    private LinearLayout saveLayout;
-    private LinearLayout fileLayout;
-    private TimeThread updateThread;
-    private static final int msgKey1 = 1;
-    private String result;
-    private String fileURL;
-
+    private TextView save;
     private TextView addTenMin;
     private TextView addOneHr;
     private TextView deleteFile;
     private TextView downloadFile;
-
-    private int timeLeft;
     private TextView timeText;
-    private String timeString;
+
+    // some global variables
+    private MsgInfo msgInfo = new MsgInfo();
+    private int timeLeft;
+    private TimeThread updateThread;
+    private static final int msgKey1 = 1;
+    private String result;
+    private String fileURL;
 
     // this handler is used to prolong 10 min
     Handler handler_ten_minutes = new Handler() {
@@ -146,6 +145,14 @@ public class DisplayActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.back);
 
+        // set back icon listener
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         //initialize text to be displayed
         msgDisplay = (EditText) findViewById(R.id.message);
         if(msgInfo.getResult() != null)
@@ -176,12 +183,12 @@ public class DisplayActivity extends AppCompatActivity {
         updateThread = new TimeThread();
         updateThread.start();
 
-        //set listener on save
-        saveLayout = (LinearLayout) findViewById(R.id.save_layout);
-        saveLayout.setOnClickListener(new View.OnClickListener(){
+        // set the listener of save
+        save = (TextView) findViewById(R.id.save);
+        save.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                // TODO: to be continued
+            public void onClick(View v) {
+                // TODO: cope with saving the message
             }
         });
 
@@ -224,13 +231,7 @@ public class DisplayActivity extends AppCompatActivity {
             }
         });
 
-        // set back icon listener
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+
     }
 
     // this function is used to resolve the parameter
@@ -241,13 +242,17 @@ public class DisplayActivity extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(originalData);
 
             // set the msgInfo
-            msgInfo.setTitle(jsonObject.getString("title"));
-            msgInfo.setSharedMsg(jsonObject.getString("shared_msg"));
+            // if the field is null, set as empty string
+            msgInfo.setTitle(jsonObject.getString("title").equals(null) ? "" : jsonObject.getString("title"));
+            msgInfo.setSharedMsg(jsonObject.getString("shared_msg").equals(null) ? "" : jsonObject.getString("shared_msg"));
             msgInfo.setTime(Integer.valueOf(jsonObject.getString("time")));
             msgInfo.setResult(jsonObject.getString("result"));
 
             // cope with the file list
             JSONArray fileArray = jsonObject.getJSONArray("file");
+            // return immediately if there is no file
+            if(fileArray == null)
+                return;
             FileInfo[] fileInfoArray = new FileInfo[fileArray.length()];
             for(int i = 0; i < fileArray.length(); i++) {
                 fileInfoArray[i].setFileName(fileArray.getJSONObject(i).getString("file_name"));

@@ -78,7 +78,6 @@
             android:layout_gravity="center">
 
             <LinearLayout
-                android:id="@+id/addTimeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="4dp"
@@ -120,7 +119,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/save_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
