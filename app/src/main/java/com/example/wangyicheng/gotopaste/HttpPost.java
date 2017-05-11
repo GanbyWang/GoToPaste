@@ -27,11 +27,8 @@ class HttpPost {
     static final int POST_FAIL = 3;
 
     // Set type
-    static final int TYPE_INFO = 0;
-    static final int TYPE_VOTE = 1;
+    static final int TYPE_NEW = 0;
     static final int TYPE_FILE = 2;
-    static final int TYPE_LOGIN = 3;
-    static final int TYPE_LOGOUT = 4;
 
     // Set timeout
     private final int READ_TIMEOUT = 3000;

@@ -16,7 +16,17 @@
         app:titleTextAppearance="@style/ToolbarTitle"
         app:subtitleTextAppearance="@style/ToolbarSubtitle"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:id="@+id/share_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+    </android.support.v7.widget.Toolbar>
 
 
     <LinearLayout

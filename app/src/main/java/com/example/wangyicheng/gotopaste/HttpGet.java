@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -19,12 +20,15 @@ class HttpGet {
     public static final int GET_FAIL = 1;
 
     // Set type
+    static final int TYPE_GETMSG = 0;
 
     // Set timeout
     final int READ_TIMEOUT = 3000;
     final int CONNECT_TIMEOUT = 3000;
 
-    public HttpGet(final String urlString, final Handler handler, final int type) {
+    // As we may have to transfer token to the server
+    // srcData is required to pass the token
+    public HttpGet(final byte[] srcData, final String urlString, final Handler handler, final int type) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -40,13 +44,20 @@ class HttpGet {
                     // Set Read Timeout
                     connection.setReadTimeout(READ_TIMEOUT);
                     // Set I/O options
-                    // connection.setDoInput(true);
-                    // connection.setDoOutput(true);
-                    // connection.setUseCaches(false);
+                    connection.setDoInput(true);
+                    connection.setDoOutput(true);
+                    connection.setUseCaches(false);
                     // Set Request Property
                     // connection.setRequestProperty("Connection", "Keep-Alive");
                     connection.setRequestProperty("Charset", "UTF-8");
                     connection.setRequestProperty("Content-Type", "application/json");
+
+                    // Get OutputStream
+                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                    // Write to OutputStream
+                    outputStream.write(srcData);
+                    outputStream.flush();
+                    outputStream.close();
 
                     // System.out.println(connection.getResponseCode());
                     // Http Success

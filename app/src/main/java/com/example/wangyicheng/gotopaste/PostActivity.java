@@ -10,21 +10,32 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class PostActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
-    private ImageButton file_button;
+    private LinearLayout file_button;
+    private TextView codeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-        file_button = (ImageButton) findViewById(R.id.file_button);
+        file_button = (LinearLayout) findViewById(R.id.add_file);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.back);
         toolbar.inflateMenu(R.menu.post_toolbar_menu);
+
+        // get the parameter "sharing code"
+        Bundle bundle = this.getIntent().getExtras();
+        String sharingCode = bundle.getString("sharingCode");
+
+        // inflate the sharing code
+        codeView = (TextView) findViewById(R.id.share_code);
+        codeView.setText("共享码：" + sharingCode);
 
         file_button.setOnClickListener(new View.OnClickListener(){
             @Override
