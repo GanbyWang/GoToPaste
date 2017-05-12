@@ -158,7 +158,7 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 String query;
-                query = "{"+"\"shared_message\""+":"+message.getText().toString()+"}";
+                query = "{\"shared_msg\":\""+message.getText().toString()+"\"}";
 //                byte query_byte = query.getBytes();
                 new HttpPut(query.getBytes(), "http://162.105.175.115:8004/message/" + sharingCode, handler, 1);
                 return true;
