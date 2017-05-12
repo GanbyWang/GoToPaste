@@ -45,7 +45,7 @@ public class DisplayActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what) {
-                case HttpPut.PUT_SUCC:
+                case HttpPost.POST_SUCC:
                     try {
                         JSONObject jsonInfo = new JSONObject(msg.obj.toString());
                         result = jsonInfo.getString("result");
@@ -60,7 +60,7 @@ public class DisplayActivity extends AppCompatActivity {
                     }
                     break;
 
-                case HttpPut.PUT_FAIL:
+                case HttpPost.POST_FAIL:
                     Toast.makeText(getApplicationContext(), "修改时间失败", Toast.LENGTH_LONG).show();
                     break;
 
@@ -73,7 +73,7 @@ public class DisplayActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what) {
-                case HttpPut.PUT_SUCC:
+                case HttpPost.POST_SUCC:
                     try {
                         JSONObject jsonInfo = new JSONObject(msg.obj.toString());
                         result = jsonInfo.getString("result");
@@ -88,8 +88,45 @@ public class DisplayActivity extends AppCompatActivity {
                     }
                     break;
 
-                case HttpPut.PUT_FAIL:
+                case HttpPost.POST_FAIL:
                     Toast.makeText(getApplicationContext(), "修改时间失败", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
+    // this handler is used to modify the message
+    Handler msgHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                // TODO: here we didn't do anything with the return value
+                case HttpPost.POST_SUCC:
+                    Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_LONG).show();
+                    break;
+
+                case HttpPost.POST_FAIL:
+                    Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
+    // this handler is used to delete the file
+    Handler deleteHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                // TODO: here we didn't do anything with the return value
+                case HttpDelete.DELETE_SUCC:
+                    Toast.makeText(getApplicationContext(), "删除成功", Toast.LENGTH_LONG).show();
+                    // update data locally
+                    msgInfo.setFile(null);
+                    fileURL = null;
+                    break;
+
+                case HttpDelete.DELETE_FAIL:
+                    Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -188,7 +225,11 @@ public class DisplayActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: cope with saving the message
+                // TODO: we haven't take token into considerations
+                String data = "{\"shared_msg\":\"" + msgDisplay.getText().toString() + "\"}";
+                new HttpPost(data.getBytes(),
+                        "http://162.105.175.115:8004/message/" + shareCode,
+                        msgHandler, HttpPost.TYPE_MODIFY);
             }
         });
 
@@ -197,9 +238,9 @@ public class DisplayActivity extends AppCompatActivity {
         addTenMin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new HttpPut("{\"scope\":600}".getBytes(),
+                new HttpPost("{\"scope\":600}".getBytes(),
                         "http://162.105.175.115:8004/message/" + shareCode + "/addtime",
-                        handler_ten_minutes, HttpPut.PUT_MODIFY);
+                        handler_ten_minutes, HttpPost.TYPE_MODIFY);
             }
         });
 
@@ -208,18 +249,25 @@ public class DisplayActivity extends AppCompatActivity {
         addOneHr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new HttpPut("{\"scope\":3600}".getBytes(),
+                new HttpPost("{\"scope\":3600}".getBytes(),
                         "http://162.105.175.115:8004/message/" + shareCode + "/addtime",
-                        handler_ten_minutes, HttpPut.PUT_MODIFY);
+                        handler_sixty_minutes, HttpPost.TYPE_MODIFY);
             }
         });
 
-        // set the listeners of the file opereations: delete and download
+        // set the listeners of the file operations: delete and download
         deleteFile = (TextView) findViewById(R.id.delete_file);
         deleteFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: delete the file
+                // check if the message has an attachment
+                if(msgInfo.getFile() == null)
+                    Toast.makeText(getApplicationContext(), "无附件文件！", Toast.LENGTH_LONG).show();
+                else {
+                    // send delete request
+                    new HttpDelete("http://162.105.175.115:8004/file/" + fileURL,
+                            deleteHandler, HttpDelete.DELETE_FILE);
+                }
             }
         });
 

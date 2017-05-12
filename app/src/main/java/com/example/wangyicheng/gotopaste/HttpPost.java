@@ -28,6 +28,7 @@ public class HttpPost {
 
     // Set type
     static final int TYPE_NEW = 0;
+    static final int TYPE_MODIFY = 1;
     static final int TYPE_FILE = 2;
 
     // Set timeout

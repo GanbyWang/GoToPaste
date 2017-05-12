@@ -20,6 +20,7 @@ public class HttpDelete {
 
     // Set type
     static final int DELETE_FILE = 0;
+
     // Set timeout
     private final int READ_TIMEOUT = 3000;
     private final int CONNECT_TIMEOUT = 3000;
