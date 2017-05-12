@@ -20,7 +20,7 @@ public class HttpPut {
     static final int PUT_FAIL = 5;
 
     // Set type
-    static final int PUT_MODIFY = 0;
+    static final int TYPE_MODIFY = 0;
 
     // Set timeout
     private final int READ_TIMEOUT = 3000;

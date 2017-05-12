@@ -39,13 +39,14 @@ public class DisplayActivity extends AppCompatActivity {
     private static final int msgKey1 = 1;
     private String result;
     private String fileURL;
+    private String sharingCode;
 
     // this handler is used to prolong 10 min
     Handler handler_ten_minutes = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what) {
-                case HttpPost.POST_SUCC:
+                case HttpPut.PUT_SUCC:
                     try {
                         JSONObject jsonInfo = new JSONObject(msg.obj.toString());
                         result = jsonInfo.getString("result");
@@ -60,7 +61,7 @@ public class DisplayActivity extends AppCompatActivity {
                     }
                     break;
 
-                case HttpPost.POST_FAIL:
+                case HttpPut.PUT_FAIL:
                     Toast.makeText(getApplicationContext(), "修改时间失败", Toast.LENGTH_LONG).show();
                     break;
 
@@ -73,7 +74,7 @@ public class DisplayActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what) {
-                case HttpPost.POST_SUCC:
+                case HttpPut.PUT_SUCC:
                     try {
                         JSONObject jsonInfo = new JSONObject(msg.obj.toString());
                         result = jsonInfo.getString("result");
@@ -88,7 +89,7 @@ public class DisplayActivity extends AppCompatActivity {
                     }
                     break;
 
-                case HttpPost.POST_FAIL:
+                case HttpPut.PUT_FAIL:
                     Toast.makeText(getApplicationContext(), "修改时间失败", Toast.LENGTH_LONG).show();
                     break;
             }
@@ -101,11 +102,11 @@ public class DisplayActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 // TODO: here we didn't do anything with the return value
-                case HttpPost.POST_SUCC:
+                case HttpPut.PUT_SUCC:
                     Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_LONG).show();
                     break;
 
-                case HttpPost.POST_FAIL:
+                case HttpPut.PUT_FAIL:
                     Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
                     break;
             }
@@ -158,7 +159,7 @@ public class DisplayActivity extends AppCompatActivity {
             switch (msg.what) {
                 case msgKey1:
                     timeLeft = timeLeft - 1;
-                    timeText.setText("还有"+ timeLeft + "秒失效");
+                    timeText.setText("还有" + timeLeft + "秒失效");
                     break;
 
                 default:
@@ -193,11 +194,12 @@ public class DisplayActivity extends AppCompatActivity {
         //initialize text to be displayed
         msgDisplay = (EditText) findViewById(R.id.message);
         if(msgInfo.getResult() != null)
-            msgDisplay.setText(msgInfo.getResult());
+            msgDisplay.setText(msgInfo.getSharedMsg());
 
         // display the sharing code
         shareCode = (TextView) findViewById(R.id.share_code);
-        shareCode.setText("共享码：" + bundle.getString("sharingCode"));
+        sharingCode = bundle.getString("sharingCode");
+        shareCode.setText("共享码：" + sharingCode);
 
         // display the time
         timeLeft = msgInfo.getTime();
@@ -227,9 +229,9 @@ public class DisplayActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // TODO: we haven't take token into considerations
                 String data = "{\"shared_msg\":\"" + msgDisplay.getText().toString() + "\"}";
-                new HttpPost(data.getBytes(),
-                        "http://162.105.175.115:8004/message/" + shareCode,
-                        msgHandler, HttpPost.TYPE_MODIFY);
+                new HttpPut(data.getBytes(),
+                        "http://162.105.175.115:8004/message/" + sharingCode,
+                        msgHandler, HttpPut.TYPE_MODIFY);
             }
         });
 
@@ -238,9 +240,9 @@ public class DisplayActivity extends AppCompatActivity {
         addTenMin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new HttpPost("{\"scope\":600}".getBytes(),
-                        "http://162.105.175.115:8004/message/" + shareCode + "/addtime",
-                        handler_ten_minutes, HttpPost.TYPE_MODIFY);
+                new HttpPut("{\"scope\":600}".getBytes(),
+                        "http://162.105.175.115:8004/message/" + sharingCode + "/addtime",
+                        handler_ten_minutes, HttpPut.TYPE_MODIFY);
             }
         });
 
@@ -249,9 +251,9 @@ public class DisplayActivity extends AppCompatActivity {
         addOneHr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new HttpPost("{\"scope\":3600}".getBytes(),
-                        "http://162.105.175.115:8004/message/" + shareCode + "/addtime",
-                        handler_sixty_minutes, HttpPost.TYPE_MODIFY);
+                new HttpPut("{\"scope\":3600}".getBytes(),
+                        "http://162.105.175.115:8004/message/" + sharingCode + "/addtime",
+                        handler_sixty_minutes, HttpPut.TYPE_MODIFY);
             }
         });
 
