@@ -21,6 +21,7 @@ public class HttpGet {
 
     // Set type
     static final int TYPE_GETMSG = 0;
+    static final int TYPE_LIST = 1;
 
     // Set timeout
     final int READ_TIMEOUT = 3000;

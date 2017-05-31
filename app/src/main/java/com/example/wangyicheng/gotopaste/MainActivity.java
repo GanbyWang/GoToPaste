@@ -20,8 +20,12 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
+
     public static int priority = 0; // priority is used to differ normal user and log-in user
                                     // 0 for normal user and 1 for log-in user
+    public static String token = null;
+    // token is stored
+
     private LinearLayout postNew;
     private String sharingCode;
     private Button queryButton;
@@ -123,8 +127,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+                if(token == null && priority == 0) {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+
+                } else if (token != null && priority == 1) {
+                    Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                    startActivity(intent);
+                }
                 return true;
             }
         });

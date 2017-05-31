@@ -30,6 +30,9 @@ public class HttpPost {
     static final int TYPE_NEW = 0;
     static final int TYPE_MODIFY = 1;
     static final int TYPE_FILE = 2;
+    static final int TYPE_LOGIN = 3;
+    static final int TYPE_SIGNUP = 4;
+    static final int TYPE_LOGOUT = 5;
 
     // Set timeout
     private final int READ_TIMEOUT = 3000;
