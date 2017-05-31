@@ -23,6 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -32,6 +33,11 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class PostActivity extends AppCompatActivity {
 
@@ -68,6 +74,8 @@ public class PostActivity extends AppCompatActivity {
                 // if the post request fails
                 case HttpPost.POST_FAIL:
                     Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
+                    Log.i("post error", (String)msg.obj);
+
                     break;
 
                 case HttpPut.PUT_SUCC:
@@ -161,6 +169,39 @@ public class PostActivity extends AppCompatActivity {
                 query = "{\"shared_msg\":\""+message.getText().toString()+"\"}";
 //                byte query_byte = query.getBytes();
                 new HttpPut(query.getBytes(), "http://162.105.175.115:8004/message/" + sharingCode, handler, 1);
+                File file = new File(route.getText().toString());
+                if(file != null){
+                    Log.i("file succeed", route.toString());
+                    try {
+                        FileInputStream inputStream = new FileInputStream(file);
+                        byte[] buf = new byte[(int) file.length()];
+                        inputStream.read(buf);
+                        inputStream.close();
+                        int nameIndex = route.getText().toString().lastIndexOf("/");
+                        String filename = route.getText().toString().substring(nameIndex+1);
+                        byte[] former = ("--WebKitFormBoundary7MA4YWxkTrZu0gW\r\n" +
+                                "Content-Disposition: form-data; name=\"content\"; " +
+                                "filename=\"" + filename +
+                                "\"\r\n" +
+                                "Content-Type: application/msword\r\n\r\n")
+                                .getBytes();
+                        Log.i("request.former", new String(former));
+                        byte[] latter = "\r\n--WebKitFormBoundary7MA4YWxkTrZu0gW--".getBytes();
+                        final byte[] srcData = new byte[former.length + buf.length + latter.length];
+
+                        System.arraycopy(former, 0, srcData, 0, former.length);
+                        System.arraycopy(buf, 0, srcData, former.length, buf.length);
+                        System.arraycopy(latter, 0, srcData, former.length + buf.length, latter.length);
+
+                        final byte[] final_srcData = srcData;
+                        new HttpPost(final_srcData, "http://162.105.175.115:8004/message/"+sharingCode+"/file", handler, HttpPost.TYPE_FILE);
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 return true;
             }
         });

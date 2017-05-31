@@ -5,19 +5,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 public class DisplayActivity extends AppCompatActivity {
     // the following variables are the views in the xml file
@@ -305,7 +300,7 @@ public class DisplayActivity extends AppCompatActivity {
                 return;
             FileInfo[] fileInfoArray = new FileInfo[fileArray.length()];
             for(int i = 0; i < fileArray.length(); i++) {
-                fileInfoArray[i].setFileName(fileArray.getJSONObject(i).getString("file_name"));
+//                fileInfoArray[i].setFileName(fileArray.getJSONObject(i).getString("file_name"));
                 fileInfoArray[i].setUrl(fileArray.getJSONObject(i).getString("url"));
             }
             msgInfo.setFile(fileInfoArray);
