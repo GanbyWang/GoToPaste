@@ -45,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject jsonObject = new JSONObject(msg.obj.toString());
 
                         // if the sharing code is illegal or empty
-                        // TODO: have to deal with how to differ a file is empty
-                        if(jsonObject.getString("result").equals("200") == false) {
+                        if(!jsonObject.getString("result").equals("200")) {
                             Toast.makeText(getApplicationContext(), "该共享码不存在", Toast.LENGTH_LONG).show();
                             return;
                         }

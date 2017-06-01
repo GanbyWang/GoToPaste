@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,7 +98,6 @@ public class DisplayActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                // TODO: here we didn't do anything with the return value
                 case HttpPut.PUT_SUCC:
                     Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_LONG).show();
                     break;
@@ -114,7 +114,6 @@ public class DisplayActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                // TODO: here we didn't do anything with the return value
                 case HttpDelete.DELETE_SUCC:
                     Toast.makeText(getApplicationContext(), "删除成功", Toast.LENGTH_LONG).show();
                     // update data locally
@@ -173,9 +172,16 @@ public class DisplayActivity extends AppCompatActivity {
         Bundle bundle = this.getIntent().getExtras();
         String originalData = bundle.getString("msgInfo");
         priority = bundle.getInt("priority");
+        sharingCode = bundle.getString("sharingCode");
 
-        if(priority == 0) {
+        // get the views
+        timeText = (TextView) findViewById(R.id.timeLeftText);
 
+        // if it's a private message, hide some views
+        if(priority == 1) {
+            timeText.setVisibility(View.GONE);
+            LinearLayout addTimeBlock = (LinearLayout) findViewById(R.id.add_time_block);
+            addTimeBlock.setVisibility(View.GONE);
         }
 
          //resolve the parameter
@@ -201,12 +207,10 @@ public class DisplayActivity extends AppCompatActivity {
         if(priority == 0) {
             // display the sharing code
             shareCode = (TextView) findViewById(R.id.share_code);
-            sharingCode = bundle.getString("sharingCode");
             shareCode.setText("共享码：" + sharingCode);
 
             // display the time
             timeLeft = msgInfo.getTime();
-            timeText = (TextView) findViewById(R.id.timeLeftText);
             timeText.setText("还有" + msgInfo.getTime() + "秒失效");
         }
 
@@ -231,8 +235,15 @@ public class DisplayActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: we haven't take token into considerations
-                String data = "{\"shared_msg\":\"" + msgDisplay.getText().toString() + "\"}";
+                String data = "";
+                // if the message is a private one
+                // we need to add token
+                if(priority == 0) {
+                    data = "{\"shared_msg\":\"" + msgDisplay.getText().toString() + "\"}";
+                } else if(priority == 1) {
+                    data = "{\"shared_msg\":\"" + msgDisplay.getText().toString() + "\",";
+                    data += "\"token\":\"" + MainActivity.token + "\"}";
+                }
                 new HttpPut(data.getBytes(),
                         "http://162.105.175.115:8004/message/" + sharingCode,
                         msgHandler, HttpPut.TYPE_MODIFY);

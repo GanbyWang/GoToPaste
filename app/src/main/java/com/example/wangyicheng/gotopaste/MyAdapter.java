@@ -60,7 +60,45 @@ public class MyAdapter extends BaseAdapter {
         }
     };
 
+    // this handler is used for query a msg
+    Handler queryHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                // if it's a POST request and it succeeded
+                case HttpGet.GET_SUCC:
+                    try {
+                        // get the json object
+                        JSONObject jsonObject = new JSONObject(msg.obj.toString());
+
+                        // jump to display activity
+                        // leave the resolution to the next activity
+                        Bundle bundle = new Bundle();
+                        bundle.putString("msgInfo", msg.obj.toString());
+                        bundle.putString("sharingCode", myData.get(displayPosition).get("msgid").toString());
+                        bundle.putInt("priority", 1);
+
+                        Intent intent = new Intent(myContext, DisplayActivity.class);
+                        intent.putExtras(bundle);
+                        myContext.startActivity(intent);
+                        // as the user might come back from posting
+                        // here we don't finish the activity
+
+                    } catch(JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                // if the GET request fails
+                case HttpGet.GET_FAIL:
+                    Toast.makeText(myContext, "请检查网络连接", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
     private int deletePosition;
+    private int displayPosition;
     private LayoutInflater myInflater;
     private Context myContext;
     // myData stores all the information needed
@@ -145,7 +183,12 @@ public class MyAdapter extends BaseAdapter {
         holder.more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // record which message is to be diplayed
+                displayPosition = position;
+                String URL = "http://162.105.175.115:8004/message/";
+                URL += myData.get(position).get("msgid");
+                URL += "?token=" + MainActivity.token;
+                new HttpGet(URL, queryHandler, HttpGet.TYPE_GETMSG);
             }
         });
 
