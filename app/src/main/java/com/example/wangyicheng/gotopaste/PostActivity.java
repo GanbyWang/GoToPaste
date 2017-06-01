@@ -52,6 +52,7 @@ public class PostActivity extends AppCompatActivity {
     private AlertDialog alert = null;
     private AlertDialog.Builder builder = null;
     static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
+    private int priority = -1;
 
     Handler handler = new Handler() {
         @Override
@@ -79,10 +80,14 @@ public class PostActivity extends AppCompatActivity {
                     break;
 
                 case HttpPut.PUT_SUCC:
-                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData myClip = ClipData.newPlainText("text", sharingCode);
-                    cm.setPrimaryClip(myClip);
-                    Toast.makeText(getApplicationContext(), "提交成功！共享码已添加到剪贴板。", Toast.LENGTH_LONG).show();
+                    if(priority == 0) {
+                        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData myClip = ClipData.newPlainText("text", sharingCode);
+                        cm.setPrimaryClip(myClip);
+                        Toast.makeText(getApplicationContext(), "共享信息发布成功！共享码已添加到剪贴板", Toast.LENGTH_LONG).show();
+                    } else if(priority == 1) {
+                        Toast.makeText(getApplicationContext(), "私有信息发布成功！", Toast.LENGTH_LONG).show();
+                    }
                     finish();
                     break;
 
@@ -137,10 +142,13 @@ public class PostActivity extends AppCompatActivity {
         // get the parameter "sharing code"
         Bundle bundle = this.getIntent().getExtras();
         sharingCode = bundle.getString("sharingCode");
+        priority = bundle.getInt("priority");
 
         // inflate the sharing code
-        codeView = (TextView) findViewById(R.id.share_code);
-        codeView.setText("共享码：" + sharingCode);
+        if(priority == 0) {
+            codeView = (TextView) findViewById(R.id.share_code);
+            codeView.setText("共享码：" + sharingCode);
+        }
         myContext = PostActivity.this;
         file_button.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -156,8 +164,6 @@ public class PostActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
                 public void onClick(View v) {
-                Intent intent = new Intent(PostActivity.this, MainActivity.class);
-                startActivity(intent);
                 finish();
             }
         });
@@ -165,8 +171,13 @@ public class PostActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                String query;
-                query = "{\"shared_msg\":\""+message.getText().toString()+"\"}";
+                String query = "";
+                if(priority == 0) {
+                    query = "{\"shared_msg\":\"" + message.getText().toString() + "\"}";
+                } else if (priority == 1) {
+                    query = "{\"token\":\"" + MainActivity.token + "\",";
+                    query += "\"shared_msg\":\"" + message.getText().toString() + "\"}";
+                }
 //                byte query_byte = query.getBytes();
                 new HttpPut(query.getBytes(), "http://162.105.175.115:8004/message/" + sharingCode, handler, 1);
                 File file = new File(route.getText().toString());

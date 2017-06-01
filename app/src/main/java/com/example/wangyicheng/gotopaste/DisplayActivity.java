@@ -35,6 +35,7 @@ public class DisplayActivity extends AppCompatActivity {
     private String result;
     private String fileURL;
     private String sharingCode;
+    private int priority = -1;
 
     // this handler is used to prolong 10 min
     Handler handler_ten_minutes = new Handler() {
@@ -171,6 +172,11 @@ public class DisplayActivity extends AppCompatActivity {
         // get the parameter
         Bundle bundle = this.getIntent().getExtras();
         String originalData = bundle.getString("msgInfo");
+        priority = bundle.getInt("priority");
+
+        if(priority == 0) {
+
+        }
 
          //resolve the parameter
         resolveParam(originalData);
@@ -191,15 +197,18 @@ public class DisplayActivity extends AppCompatActivity {
         if(msgInfo.getResult() != null)
             msgDisplay.setText(msgInfo.getSharedMsg());
 
-        // display the sharing code
-        shareCode = (TextView) findViewById(R.id.share_code);
-        sharingCode = bundle.getString("sharingCode");
-        shareCode.setText("共享码：" + sharingCode);
+        // only when the message is a shared one do we show the code
+        if(priority == 0) {
+            // display the sharing code
+            shareCode = (TextView) findViewById(R.id.share_code);
+            sharingCode = bundle.getString("sharingCode");
+            shareCode.setText("共享码：" + sharingCode);
 
-        // display the time
-        timeLeft = msgInfo.getTime();
-        timeText = (TextView) findViewById(R.id.timeLeftText);
-        timeText.setText("还有" + msgInfo.getTime() + "秒失效");
+            // display the time
+            timeLeft = msgInfo.getTime();
+            timeText = (TextView) findViewById(R.id.timeLeftText);
+            timeText.setText("还有" + msgInfo.getTime() + "秒失效");
+        }
 
         // display the file name
         fileName = (TextView) findViewById(R.id.file_name);
@@ -280,7 +289,6 @@ public class DisplayActivity extends AppCompatActivity {
     }
 
     // this function is used to resolve the parameter
-    // TODO: there might be some fields as null, must check first!
     void resolveParam(String originalData) {
         try {
             // get the jason object
@@ -296,11 +304,14 @@ public class DisplayActivity extends AppCompatActivity {
             // cope with the file list
             JSONArray fileArray = jsonObject.getJSONArray("file");
             // return immediately if there is no file
-            if(fileArray == null)
+            if(fileArray.length() == 0) {
+                msgInfo.setFile(null);
                 return;
+            }
             FileInfo[] fileInfoArray = new FileInfo[fileArray.length()];
             for(int i = 0; i < fileArray.length(); i++) {
-//                fileInfoArray[i].setFileName(fileArray.getJSONObject(i).getString("file_name"));
+                fileInfoArray[i] = new FileInfo();
+                fileInfoArray[i].setFileName(fileArray.getJSONObject(i).getString("file_name"));
                 fileInfoArray[i].setUrl(fileArray.getJSONObject(i).getString("url"));
             }
             msgInfo.setFile(fileInfoArray);

@@ -8,8 +8,6 @@ public class MsgInfo {
     private String title;
     private String shared_msg;
     private int time;
-    // though I write one variable here
-    // actually it should be an array
     private FileInfo[] file;
     private String result;
 

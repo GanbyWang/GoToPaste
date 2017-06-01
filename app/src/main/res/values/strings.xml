@@ -20,4 +20,7 @@
     <string name="save">保存</string>
     <string name="account_center">用户中心</string>
     <string name="upload_file">上传文件</string>
+    <string name="old_password">原密码</string>
+    <string name="new_password">新密码</string>
+    <string name="confirm_password">确认新密码</string>
 </resources>

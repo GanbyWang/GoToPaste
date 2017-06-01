@@ -7,20 +7,31 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // overwrite the listener in order to change the tabs
 public class UserActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private FloatingActionButton postButton;
     MyAdapter listAdapter = null;
+    private String[] abstracts, msgIds;
+    private int msgNum;
+    private ListView listView;
 
-    Handler postHandler = new Handler() {
+    public Handler postHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -34,6 +45,7 @@ public class UserActivity extends AppCompatActivity {
                         // transfer the sharing code as a parameter
                         Bundle bundle = new Bundle();
                         bundle.putString("sharingCode", sharingCode);
+                        bundle.putInt("priority", 1);
 
                         Intent intent = new Intent(UserActivity.this, PostActivity.class);
                         intent.putExtras(bundle);
@@ -55,15 +67,64 @@ public class UserActivity extends AppCompatActivity {
     };
 
     // this handler is used for query a sharing code
-    Handler getHandler = new Handler() {
+    public Handler getHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                // if it's a POST request and it succeeded
-                case HttpPost.POST_SUCC:
+                // if it's a GET request and it succeeded
+                case HttpGet.GET_SUCC:
                     try {
-                        // get the jason object
+                        // get the json object
                         JSONObject jsonObject = new JSONObject(msg.obj.toString());
+
+                        String result = jsonObject.getString("result");
+                        Log.i("result", result);
+
+                        // get the message array
+                        JSONArray jsonArray = jsonObject.getJSONArray("message_list");
+
+                        // get the number of messages
+                        msgNum = jsonArray.length();
+
+                        Log.i("msgNum", "" + msgNum);
+
+                        // allocate the list
+                        msgIds = new String[msgNum];
+                        abstracts = new String[msgNum];
+                        for(int i = 0; i < msgNum; i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+
+                            msgIds[i] = new String();
+                            abstracts[i] = new String();
+                            // get the info
+                            msgIds[i] = object.getString("msgid");
+                            abstracts[i] = object.getString("abstract");
+
+                            if(abstracts[i] == null)
+                                abstracts[i] = "null";
+
+                            Log.i("msgid", msgIds[i]);
+                            Log.i("abstract", abstracts[i]);
+
+                            if(abstracts[i].length() >= 25) {
+                                abstracts[i] = abstracts[i].substring(0, 25);
+                            }
+                        }
+
+                        // get the list view
+                        listView = (ListView) findViewById(R.id.msg_list);
+
+                        // allocate the adapter
+                        if(listAdapter == null) {
+                            listAdapter = new MyAdapter(UserActivity.this);
+                        } else {
+                            listAdapter.notifyDataSetChanged();
+                        }
+
+                        // get the data
+                        listAdapter.myData = getData();
+
+                        listView.setAdapter(listAdapter);
 
                     } catch(JSONException e) {
                         e.printStackTrace();
@@ -71,7 +132,7 @@ public class UserActivity extends AppCompatActivity {
                     break;
 
                 // if the GET request fails
-                case HttpPost.POST_FAIL:
+                case HttpGet.GET_FAIL:
                     Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
                     break;
             }
@@ -124,6 +185,29 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
+        // send the GET request to get the list
+        Log.i("token", MainActivity.token);
         new HttpGet("http://162.105.175.115:8004/message/all?token=" + MainActivity.token, getHandler, HttpGet.TYPE_LIST);
+    }
+
+    // when the activity resumes
+    // update the list
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new HttpGet("http://162.105.175.115:8004/message/all?token=" + MainActivity.token, getHandler, HttpGet.TYPE_LIST);
+    }
+
+    private List<Map<String, Object>> getData() {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map;
+        for (int i = 0; i < msgNum; i++) {
+            map = new HashMap<String, Object>();
+            map.put("abstract", abstracts[i]);
+            map.put("msgid", msgIds[i]);
+
+            list.add(map);
+        }
+        return list;
     }
 }

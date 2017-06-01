@@ -22,6 +22,7 @@ public class HttpGet {
     // Set type
     static final int TYPE_GETMSG = 0;
     static final int TYPE_LIST = 1;
+    static final int DELETE_MSG = 2;
 
     // Set timeout
     final int READ_TIMEOUT = 3000;
@@ -45,20 +46,13 @@ public class HttpGet {
                     // Set Read Timeout
                     connection.setReadTimeout(READ_TIMEOUT);
                     // Set I/O options
-                    connection.setDoInput(true);
-                    connection.setDoOutput(true);
-                    connection.setUseCaches(false);
+                    // connection.setDoInput(true);
+                    // connection.setDoOutput(true);
+                    // connection.setUseCaches(false);
                     // Set Request Property
                     // connection.setRequestProperty("Connection", "Keep-Alive");
                     connection.setRequestProperty("Charset", "UTF-8");
                     connection.setRequestProperty("Content-Type", "application/json");
-
-                    // Get OutputStream
-                    // DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-                    // Write to OutputStream
-                    // outputStream.write(srcData);
-                    // outputStream.flush();
-                    // outputStream.close();
 
                     // System.out.println(connection.getResponseCode());
                     // Http Success

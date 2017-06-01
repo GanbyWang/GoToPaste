@@ -21,6 +21,7 @@ public class HttpPut {
 
     // Set type
     static final int TYPE_MODIFY = 0;
+    static final int TYPE_NEW_PWD = 1;
 
     // Set timeout
     private final int READ_TIMEOUT = 3000;

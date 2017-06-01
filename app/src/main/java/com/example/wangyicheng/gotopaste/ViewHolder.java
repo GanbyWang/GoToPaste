@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 public final class ViewHolder {
     public TextView title;
-    public TextView time;
-    public TextView size;
+    public ImageView delete;
     public ImageView more;
 }

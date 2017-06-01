@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 // if it's a POST request and it succeeded
-                case HttpPost.POST_SUCC:
+                case HttpGet.GET_SUCC:
                     try {
                         // get the jason object
                         JSONObject jsonObject = new JSONObject(msg.obj.toString());
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                         Bundle bundle = new Bundle();
                         bundle.putString("msgInfo", msg.obj.toString());
                         bundle.putString("sharingCode", querySharingCode);
+                        bundle.putInt("priority", 0);
 
                         Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
                         intent.putExtras(bundle);
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 // if the GET request fails
-                case HttpPost.POST_FAIL:
+                case HttpGet.GET_FAIL:
                     Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
                     break;
             }
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                         // transfer the sharing code as a parameter
                         Bundle bundle = new Bundle();
                         bundle.putString("sharingCode", sharingCode);
+                        bundle.putInt("priority", 0);
 
                         Intent intent = new Intent(MainActivity.this, PostActivity.class);
                         intent.putExtras(bundle);
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // send a get request
                 // no token (send as empty) and set type as TYPE_GETMSG
-                new HttpPost("{}".getBytes(), "http://162.105.175.115:8004/message/" + querySharingCode, queryHandler, HttpGet.TYPE_GETMSG);
+                new HttpGet("http://162.105.175.115:8004/message/" + querySharingCode, queryHandler, HttpGet.TYPE_GETMSG);
             }
         });
     }

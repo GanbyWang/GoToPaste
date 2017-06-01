@@ -100,14 +100,6 @@
 
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/set_private"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:text="@string/set_private"
-            android:textSize="12sp"
-            android:layout_gravity="center"/>
-
 
     </LinearLayout>
 
