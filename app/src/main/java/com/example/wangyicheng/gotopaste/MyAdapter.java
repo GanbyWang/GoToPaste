@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -30,6 +31,26 @@ import java.util.TimeZone;
  */
 
 public class MyAdapter extends BaseAdapter {
+
+    // this function is used to seek the content
+    public void updateDataBySearch(String seekContent) {
+
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map;
+
+        for(int i = 0; i < myData.size(); i++) {
+            if(myData.get(i).get("abstract").toString().indexOf(seekContent) != -1) {
+                map = new HashMap<String, Object>();
+                map.put("abstract", myData.get(i).get("abstract"));
+                map.put("msgid", myData.get(i).get("msgid"));
+
+                list.add(map);
+            }
+        }
+
+        myData = list;
+        notifyDataSetChanged();
+    }
 
     Handler deleteHandler = new Handler() {
         @Override

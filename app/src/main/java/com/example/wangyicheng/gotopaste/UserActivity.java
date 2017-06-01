@@ -1,6 +1,7 @@
 package com.example.wangyicheng.gotopaste;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,6 +33,7 @@ public class UserActivity extends AppCompatActivity {
     private String[] abstracts, msgIds;
     private int msgNum;
     private ListView listView;
+    private ImageButton seekButton;
 
     public Handler postHandler = new Handler() {
         @Override
@@ -173,6 +177,28 @@ public class UserActivity extends AppCompatActivity {
         });
 
         toolbar.inflateMenu(R.menu.main_toolbar_menu);
+
+        // get the seek button
+        seekButton = (ImageButton) findViewById(R.id.seek_button);
+        // set the listener
+        seekButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // get the content of searching
+                EditText seekContent = (EditText) findViewById(R.id.find_content);
+                String seek_content = seekContent.getText().toString();
+
+                // check the input
+                if(seek_content.equals("")) {
+                    Toast.makeText(getApplicationContext(), "检索内容不可为空", Toast.LENGTH_LONG).show();
+                    new HttpGet("http://162.105.175.115:8004/message/all?token=" + MainActivity.token, getHandler, HttpGet.TYPE_LIST);
+                    return;
+                }
+
+                // update the data
+                listAdapter.updateDataBySearch(seek_content);
+            }
+        });
 
         // get the post button
         postButton = (FloatingActionButton) findViewById(R.id.post_button);
