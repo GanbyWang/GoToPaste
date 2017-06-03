@@ -1,10 +1,18 @@
 package com.example.wangyicheng.gotopaste;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -14,6 +22,15 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DisplayActivity extends AppCompatActivity {
     // the following variables are the views in the xml file
@@ -27,7 +44,76 @@ public class DisplayActivity extends AppCompatActivity {
     private TextView deleteFile;
     private TextView downloadFile;
     private TextView timeText;
-
+    private AlertDialog alert = null;
+    private AlertDialog.Builder builder = null;
+    static private Context myContext;
+    private static String[][] MIME_MapTable = {
+            //{后缀名， MIME类型}
+            {".3gp", "video/3gpp"},
+            {".apk", "application/vnd.android.package-archive"},
+            {".asf", "video/x-ms-asf"},
+            {".avi", "video/x-msvideo"},
+            {".bin", "application/octet-stream"},
+            {".bmp", "image/bmp"},
+            {".c", "text/plain"},
+            {".class", "application/octet-stream"},
+            {".conf", "text/plain"},
+            {".cpp", "text/plain"},
+            {".doc", "application/msword"},
+            {".exe", "application/octet-stream"},
+            {".gif", "image/gif"},
+            {".gtar", "application/x-gtar"},
+            {".gz", "application/x-gzip"},
+            {".h", "text/plain"},
+            {".htm", "text/html"},
+            {".html", "text/html"},
+            {".jar", "application/java-archive"},
+            {".java", "text/plain"},
+            {".jpeg", "image/jpeg"},
+            {".jpg", "image/jpeg"},
+            {".js", "application/x-javascript"},
+            {".log", "text/plain"},
+            {".m3u", "audio/x-mpegurl"},
+            {".m4a", "audio/mp4a-latm"},
+            {".m4b", "audio/mp4a-latm"},
+            {".m4p", "audio/mp4a-latm"},
+            {".m4u", "video/vnd.mpegurl"},
+            {".m4v", "video/x-m4v"},
+            {".mov", "video/quicktime"},
+            {".mp2", "audio/x-mpeg"},
+            {".mp3", "audio/x-mpeg"},
+            {".mp4", "video/mp4"},
+            {".mpc", "application/vnd.mpohun.certificate"},
+            {".mpe", "video/mpeg"},
+            {".mpeg", "video/mpeg"},
+            {".mpg", "video/mpeg"},
+            {".mpg4", "video/mp4"},
+            {".mpga", "audio/mpeg"},
+            {".msg", "application/vnd.ms-outlook"},
+            {".ogg", "audio/ogg"},
+            {".pdf", "application/pdf"},
+            {".png", "image/png"},
+            {".pps", "application/vnd.ms-powerpoint"},
+            {".ppt", "application/vnd.ms-powerpoint"},
+            {".prop", "text/plain"},
+            {".rar", "application/x-rar-compressed"},
+            {".rc", "text/plain"},
+            {".rmvb", "audio/x-pn-realaudio"},
+            {".rtf", "application/rtf"},
+            {".sh", "text/plain"},
+            {".tar", "application/x-tar"},
+            {".tgz", "application/x-compressed"},
+            {".txt", "text/plain"},
+            {".wav", "audio/x-wav"},
+            {".wma", "audio/x-ms-wma"},
+            {".wmv", "audio/x-ms-wmv"},
+            {".wps", "application/vnd.ms-works"},
+            //{".xml", "text/xml"},
+            {".xml", "text/plain"},
+            {".z", "application/x-compress"},
+            {".zip", "application/zip"},
+            {"", "*/*"}
+    };
     // some global variables
     private MsgInfo msgInfo = new MsgInfo();
     private int timeLeft;
@@ -114,14 +200,14 @@ public class DisplayActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case HttpDelete.DELETE_SUCC:
+                case HttpGet.GET_SUCC:
                     Toast.makeText(getApplicationContext(), "删除成功", Toast.LENGTH_LONG).show();
                     // update data locally
                     msgInfo.setFile(null);
                     fileURL = null;
                     break;
 
-                case HttpDelete.DELETE_FAIL:
+                case HttpGet.GET_FAIL:
                     Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
                     break;
             }
@@ -168,6 +254,8 @@ public class DisplayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
 
+
+        myContext = (Context) this;
         // get the parameter
         Bundle bundle = this.getIntent().getExtras();
         String originalData = bundle.getString("msgInfo");
@@ -282,8 +370,11 @@ public class DisplayActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "无附件文件！", Toast.LENGTH_LONG).show();
                 else {
                     // send delete request
-                    new HttpDelete("http://162.105.175.115:8004/file/" + fileURL,
-                            deleteHandler, HttpDelete.DELETE_FILE);
+                    String query = "http://162.105.175.115:8004/delete/file/" + fileURL;
+                    if (priority == 1)  {
+                        query += "?token=" + MainActivity.token;
+                    }
+                    new HttpGet(query, deleteHandler, 1);
                 }
             }
         });
@@ -292,12 +383,134 @@ public class DisplayActivity extends AppCompatActivity {
         downloadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FileInfo[] files = msgInfo.getFile();
+                for (final FileInfo file: files) {
+                    if (file.getUrl() != null){
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run(){
+                                String downloadUrl = "http://162.105.175.115:8004/file" + file.getUrl();
+                                if (priority == 1)
+                                    downloadUrl += "?token=" + MainActivity.token;
+                                try {
+                                    Log.i("downloadUrl",downloadUrl);
+                                    URL url = new URL(downloadUrl);
+                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                    String SDCard = Environment.getExternalStorageDirectory() + "/" + Environment.DIRECTORY_DOWNLOADS;
+                                    String fileName = file.getUrl().substring(file.getUrl().lastIndexOf('/')+1);
+                                    fileName = fileName.substring(sharingCode.length());
+                                    String pathName = SDCard + '/' + fileName;
+                                    Log.i("download path",pathName);
+                                    final File newFile = new File(pathName);
+                                    InputStream input = conn.getInputStream();
+                                    OutputStream output;
+
+                                    newFile.createNewFile();
+                                    output = new FileOutputStream(newFile);
+                                    byte[] buffer = new byte[1024];
+                                    int res;
+                                    while ((res = input.read(buffer,0,buffer.length)) != -1){
+                                        output.write(buffer,0,res);
+                                    }
+                                    output.flush();
+                                    output.close();
+                                    Looper.prepare();
+                                    alert = null;
+                                    builder = new android.support.v7.app.AlertDialog.Builder(myContext);
+                                    alert = builder.setMessage("下载成功，是否打开文件？")
+                                            .setNegativeButton("是", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    openFile(myContext,newFile);
+                                                }
+                                            })
+                                            .setPositiveButton("否", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                }
+                                            }).create();
+                                    alert.show();
+                                    Toast.makeText(getApplicationContext(), "保存为\r\n" + Environment.DIRECTORY_DOWNLOADS + fileName, Toast.LENGTH_LONG).show();
+                                    Looper.loop();
+                                } catch (MalformedURLException e) {
+                                    Looper.prepare();
+                                    Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
+                                    Looper.loop();
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    Looper.prepare();
+                                    Toast.makeText(getApplicationContext(), "请检查网络连接", Toast.LENGTH_LONG).show();
+                                    Looper.loop();
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                }
                 // TODO: download the file
             }
         });
 
 
     }
+
+//    public void openFile(Uri uri) {
+//        Log.i("uri",uri.getPath());
+//        Intent intent = new Intent();
+//        intent.setAction(android.content.Intent.ACTION_VIEW);
+//        File file = new File(String.valueOf(uri)); // set your audio path
+//        intent.setDataAndType(Uri.fromFile(file), "*/*");
+//
+//        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+//
+//        Notification noti = new NotificationCompat.Builder(this)
+//                .setContentTitle("Download completed")
+//                .setContentText("Song name")
+//                .setContentIntent(pIntent).build();
+//
+//        noti.flags |= Notification.FLAG_AUTO_CANCEL;
+//        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//        notificationManager.notify(0, noti);
+//    }
+    public static void openFile(Context context,File file){
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        //设置intent的Action属性
+        intent.setAction(Intent.ACTION_VIEW);
+        //获取文件file的MIME类型
+        String type = getMIMEType(file);
+        //设置intent的data和Type属性。
+        intent.setDataAndType(Uri.fromFile(file), type);
+        //跳转
+        try {
+            context.startActivity(intent);
+        } catch (Exception e) {
+//            logger.error("FileUtil", e);
+            Toast.makeText(context, "找不到打开此文件的应用！", Toast.LENGTH_SHORT).show();
+        }
+    }
+    /**
+     * 获得文件的mimeType
+     * @param file
+     * @return
+     */
+    public static String getMIMEType(File file) {
+        String type = "*/*";
+        if(file == null) return type;
+        String fName = file.getName();
+        // 取得扩展名
+        String end = fName.substring(fName.lastIndexOf("."),
+                fName.length()).toLowerCase();
+        if (end.equals("")) return type;
+        //在MIME和文件类型的匹配表中找到对应的MIME类型。
+        for (int i = 0; i < MIME_MapTable.length; i++) {
+            if (end.equals(MIME_MapTable[i][0]))
+                type = MIME_MapTable[i][1];
+        }
+
+        return type;
+    }
+
 
     // this function is used to resolve the parameter
     void resolveParam(String originalData) {

@@ -179,7 +179,9 @@ public class PostActivity extends AppCompatActivity {
                     query += "\"shared_msg\":\"" + message.getText().toString() + "\"}";
                 }
 //                byte query_byte = query.getBytes();
-                new HttpPut(query.getBytes(), "http://162.105.175.115:8004/message/" + sharingCode, handler, 1);
+                String temp = "http://162.105.175.115:8004/message/" + sharingCode;
+
+                new HttpPut(query.getBytes(), temp, handler, 1);
                 File file = new File(route.getText().toString());
                 if(file != null){
                     Log.i("file succeed", route.toString());
@@ -205,7 +207,11 @@ public class PostActivity extends AppCompatActivity {
                         System.arraycopy(latter, 0, srcData, former.length + buf.length, latter.length);
 
                         final byte[] final_srcData = srcData;
-                        new HttpPost(final_srcData, "http://162.105.175.115:8004/message/"+sharingCode+"/file", handler, HttpPost.TYPE_FILE);
+                        String t;
+                        t = "http://162.105.175.115:8004/message/"+sharingCode+"/file";
+                        if (priority == 1)
+                            t += "?token=" + MainActivity.token;
+                        new HttpPost(final_srcData, t, handler, HttpPost.TYPE_FILE);
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
