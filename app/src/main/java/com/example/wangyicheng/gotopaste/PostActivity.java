@@ -199,7 +199,16 @@ public class PostActivity extends AppCompatActivity {
                                 "Content-Type: application/msword\r\n\r\n")
                                 .getBytes();
                         Log.i("request.former", new String(former));
-                        byte[] latter = "\r\n--WebKitFormBoundary7MA4YWxkTrZu0gW--".getBytes();
+                        String latterSrc = null;
+                        if (priority == 0){
+                            latterSrc = "\r\n--WebKitFormBoundary7MA4YWxkTrZu0gW--";
+                        }
+
+                        if (priority == 1){
+                            latterSrc+="\r\n--WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"token\"\r\n\r\n"+MainActivity.token+"\r\n--WebKitFormBoundary7MA4YWxkTrZu0gW--";
+                        }
+
+                        byte[] latter = (latterSrc).getBytes();
                         final byte[] srcData = new byte[former.length + buf.length + latter.length];
 
                         System.arraycopy(former, 0, srcData, 0, former.length);

@@ -430,7 +430,7 @@ public class DisplayActivity extends AppCompatActivity {
                                                 }
                                             }).create();
                                     alert.show();
-                                    Toast.makeText(getApplicationContext(), "保存为\r\n" + Environment.DIRECTORY_DOWNLOADS + fileName, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), "保存为\r\n" + pathName/*Environment.DIRECTORY_DOWNLOADS + '/' +fileName*/, Toast.LENGTH_LONG).show();
                                     Looper.loop();
                                 } catch (MalformedURLException e) {
                                     Looper.prepare();
