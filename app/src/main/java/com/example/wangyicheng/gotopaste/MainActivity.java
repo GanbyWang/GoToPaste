@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -30,8 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private String sharingCode;
     private Button queryButton;
     private String querySharingCode;
+    private Button helpButton;
 
-    private MsgInfo msgInfo;
+    private AlertDialog alert = null;
+    private AlertDialog.Builder builder = null;
 
     // this handler is used for query a sharing code
     Handler queryHandler = new Handler() {
@@ -170,6 +173,30 @@ public class MainActivity extends AppCompatActivity {
                 // send a get request
                 // no token (send as empty) and set type as TYPE_GETMSG
                 new HttpGet("http://162.105.175.115:8004/message/" + querySharingCode, queryHandler, HttpGet.TYPE_GETMSG);
+            }
+        });
+
+        // get help button
+        helpButton = (Button) findViewById(R.id.help_button);
+        // set listener
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // use a dialog to show the help information
+                alert = null;
+                builder = new android.support.v7.app.AlertDialog.Builder(MainActivity.this);
+                alert = builder.setTitle("使用指南")
+                        .setMessage("gotoPaste 是一个方便传递文本信息的工具，免除数据线或登录操作的步骤\n" +
+                        "    你可以创建新的剪贴板\n" +
+                        "    你可以使用编号查询存在的剪贴板\n" +
+                        "    可以增加时间，但增加总时长最多两小时")
+                        .setCancelable(false)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).create();
+                alert.show();
             }
         });
     }
