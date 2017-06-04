@@ -38,18 +38,21 @@ public class MyAdapter extends BaseAdapter {
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         Map<String, Object> map;
 
-        for(int i = 0; i < myData.size(); i++) {
-            if(myData.get(i).get("abstract").toString().indexOf(seekContent) != -1) {
-                map = new HashMap<String, Object>();
-                map.put("abstract", myData.get(i).get("abstract"));
-                map.put("msgid", myData.get(i).get("msgid"));
+        // search will happen only when the data is not empty
+        if(myData.size() > 0) {
+            for (int i = 0; i < myData.size(); i++) {
+                if (myData.get(i).get("abstract").toString().indexOf(seekContent) != -1) {
+                    map = new HashMap<String, Object>();
+                    map.put("abstract", myData.get(i).get("abstract"));
+                    map.put("msgid", myData.get(i).get("msgid"));
 
-                list.add(map);
+                    list.add(map);
+                }
             }
-        }
 
-        myData = list;
-        notifyDataSetChanged();
+            myData = list;
+            notifyDataSetChanged();
+        }
     }
 
     Handler deleteHandler = new Handler() {
