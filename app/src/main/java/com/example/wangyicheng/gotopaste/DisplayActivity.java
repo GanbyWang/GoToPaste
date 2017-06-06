@@ -205,6 +205,10 @@ public class DisplayActivity extends AppCompatActivity {
                     // update data locally
                     msgInfo.setFile(null);
                     fileURL = null;
+
+                    // update the display
+                    fileName.setText("没有附件文件");
+
                     break;
 
                 case HttpGet.GET_FAIL:
@@ -383,6 +387,12 @@ public class DisplayActivity extends AppCompatActivity {
         downloadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // check if the message has an attachment
+                if(msgInfo.getFile() == null) {
+                    Toast.makeText(getApplicationContext(), "无附件文件！", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 FileInfo[] files = msgInfo.getFile();
                 for (final FileInfo file: files) {
                     if (file.getUrl() != null){

@@ -34,6 +34,7 @@ public class UserActivity extends AppCompatActivity {
     private int msgNum;
     private ListView listView;
     private ImageButton seekButton;
+    private int seekFlag = 0;
 
     public Handler postHandler = new Handler() {
         @Override
@@ -130,6 +131,24 @@ public class UserActivity extends AppCompatActivity {
 
                         listView.setAdapter(listAdapter);
 
+                        if(seekFlag == 1) {
+                            // get the content of searching
+                            EditText seekContent = (EditText) findViewById(R.id.find_content);
+                            String seek_content = seekContent.getText().toString();
+
+                            // check the input
+                            if (seek_content.equals("")) {
+                                Toast.makeText(getApplicationContext(), "检索内容不可为空", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            // update the data
+                            listAdapter.updateDataBySearch(seek_content);
+
+                            // reset the flag
+                            seekFlag = 0;
+                        }
+
                     } catch(JSONException e) {
                         e.printStackTrace();
                     }
@@ -184,19 +203,12 @@ public class UserActivity extends AppCompatActivity {
         seekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // get the content of searching
-                EditText seekContent = (EditText) findViewById(R.id.find_content);
-                String seek_content = seekContent.getText().toString();
 
-                // check the input
-                if(seek_content.equals("")) {
-                    Toast.makeText(getApplicationContext(), "检索内容不可为空", Toast.LENGTH_LONG).show();
-                    new HttpGet("http://162.105.175.115:8004/message/all?token=" + MainActivity.token, getHandler, HttpGet.TYPE_LIST);
-                    return;
-                }
+                // set the flag
+                seekFlag = 1;
 
-                // update the data
-                listAdapter.updateDataBySearch(seek_content);
+                // reload the list
+                new HttpGet("http://162.105.175.115:8004/message/all?token=" + MainActivity.token, getHandler, HttpGet.TYPE_LIST);
             }
         });
 
